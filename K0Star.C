@@ -41,18 +41,19 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 
 	print_start(); // start timing print
 
-
 	// for track efficiency correction
 	// Track or particle efficiency file
-	TFile *fileeff = TFile::Open("DATA_SAMPLES/auxfiles/Hijing_8TeV_dataBS.root");
-    TH2 *eff_factor = nullptr; 
-    fileeff->GetObject("rTotalEff3D_0", eff_factor);  // eff / (1 - fake rate)
-	TFile *fileefftight = TFile::Open("DATA_SAMPLES/auxfiles/Hijing_8TeV_MB_eff_v3_tight.root");
-    TH2 *eff_factortight = nullptr; 
-    fileefftight->GetObject("rTotalEff3D_0", eff_factortight);  // eff / (1 - fake rate)
-	TFile *fileeffloose = TFile::Open("DATA_SAMPLES/auxfiles/Hijing_8TeV_MB_eff_v3_loose.root");
-    TH2 *eff_factorloose = nullptr; 
-    fileeffloose->GetObject("rTotalEff3D_0", eff_factorloose);  // eff / (1 - fake rate)
+	TFile fileeff("DATA_SAMPLES/auxfiles/Hijing_8TeV_dataBS.root","READ");
+    	TH2 *eff_factor = nullptr; 
+    	fileeff.GetObject("rTotalEff3D_0", eff_factor);  // eff / (1 - fake rate)
+	TFile fileefftight("DATA_SAMPLES/auxfiles/Hijing_8TeV_MB_eff_v3_tight.root","READ");
+    	TH2 *eff_factortight = nullptr; 
+    	fileefftight.GetObject("rTotalEff3D_0", eff_factortight);  // eff / (1 - fake rate)
+	TFile fileeffloose("DATA_SAMPLES/auxfiles/Hijing_8TeV_MB_eff_v3_loose.root","READ");
+    	TH2 *eff_factorloose = nullptr; 
+    	fileeffloose.GetObject("rTotalEff3D_0", eff_factorloose);  // eff / (1 - fake rate)
+
+	TFile *outputFile = new TFile(outputFileName, "RECREATE");
 
 	// Read the input jet file(s)
 	fstream inputfile;
@@ -446,7 +447,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	K0StarTreeOutput->Branch("K0Star_phi","vector<float>", &K0Star_PhiVector);
 	K0StarTreeOutput->Branch("K0Star_mass","vector<float>", &K0Star_MassVector);
 	K0StarTreeOutput->Branch("K0Star_charge","vector<int>", &K0Star_ChargeVector);
-	
+
 	K0StarTreeOutput->Branch("K0s_nominal","vector<int>", &K0s_NominalVector);
 	K0StarTreeOutput->Branch("K0s_tight","vector<int>", &K0s_TightVector);
 	K0StarTreeOutput->Branch("K0s_loose","vector<int>", &K0s_LooseVector);
@@ -466,7 +467,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	K0StarTreeOutput->Branch("Trk_pt","vector<float>", &Trk_PtVector);
 	K0StarTreeOutput->Branch("Trk_eta","vector<float>", &Trk_EtaVector);
 	K0StarTreeOutput->Branch("Trk_phi","vector<float>", &Trk_PhiVector);
-	
+
 	// Event plane
 	TTree *checkFlatteningTreeOutput = new TTree("tree","");
 	float epang_HFm2, epang_HFp2,epang_HFm3, epang_HFp3, epang_HFm4, epang_HFp4, epang_trackmid2, epang_trackmid3, epang_trackmid4, epang_trackm2, epang_trackm3, epang_trackm4, epang_trackp2, epang_trackp3, epang_trackp4;	
@@ -583,7 +584,6 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	skimTreeOutput->Branch("pVertexFilterCutGplus",&pVertexFilterCutGplusBit,"pVertexFilterCutGplus/I");
 	skimTreeOutput->Branch("pVertexFilterCutVtx1",&pVertexFilterCutVtx1Bit,"pVertexFilterCutVtx1/I");
 
-
 	// ========================================== //
 	//			Starting matching events	      //
 	// ========================================== //
@@ -602,10 +602,10 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 
 	int nEvents = MainV0Tree->GetEntries();
 	cout << "There are " << nEvents << " events" << endl;
-	
+ 	int matchedevents = 0;	
 	for(int iEvent = 0; iEvent < nEvents; iEvent++) {
 		
-		//if( iEvent % 10000 == 0 )	std::cout << "iEvent: " << iEvent <<	" of " << nEvents << std::endl;
+		if( iEvent % 100000 == 0 )	std::cout << "iEvent: " << iEvent <<	" of " << nEvents << std::endl;
 
 		// ========================================== //
 		//			Start with the V0s	              //
@@ -629,7 +629,10 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 		heavyIonTree->GetEntry(i_entry);
 		skimTree->GetEntry(i_entry);
 		trackTree->GetEntry(i_entry);
-		
+	        checkFlatteningTree->GetEntry(i_entry);
+
+		matchedevents = matchedevents + 1;
+
 		Ntroff = 0;
 		Nch = 0.0;
 		NchLoose = 0.0;
@@ -730,15 +733,15 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 		mult_trackm4 = (float) eventPlaneMultiplicity[105];
 		mult_trackp4 = (float) eventPlaneMultiplicity[106];
 
-    	// --> Loop over K0s+charged hadrons
-    	if( K0s_pt->size() > 0 && nTracks > 0 ){
+	    	// --> Loop over K0s+charged hadrons
+    		if( K0s_pt->size() > 0 && nTracks > 0 ){
     	
-    		int totalsize = K0s_pt->size() * nTracks;
+    			int totalsize = K0s_pt->size() * nTracks;
     		
   	 		for(int idx = 0; idx < totalsize; idx++){ // 2 loops in one
    		
-    			size_t ik0s = idx / nTracks;
-    			size_t jtrk = idx % nTracks;   			
+    				int ik0s = idx / nTracks;
+    				int jtrk = idx % nTracks;   			
 
 				// start doing K0s calculations 
 				
@@ -817,14 +820,13 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				if(fabs(trackVertexDistanceZArray[jtrk]/trackVertexDistanceZErrorArray[jtrk]) >= 5.0) continue;				
 			
 				// Construct Lorentz vectors
-    			LorentzVector neutralkaon(K0s_pt->at(ik0s), K0s_eta->at(ik0s), K0s_phi->at(ik0s), K0s_mass->at(ik0s));
-    			LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
+    				LorentzVector neutralkaon(K0s_pt->at(ik0s), K0s_eta->at(ik0s), K0s_phi->at(ik0s), K0s_mass->at(ik0s));
+    				LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
 
-			    // Combine them and compute invariant mass
-			    LorentzVector system = neutralkaon + chargedhadron;
-    			if(system.M() < 0.6 || system.M() > 1.3) continue;			
-				    			if( system.M() < 0.6 ) continue;
-    			if( system.M() > 1.3 ) continue;
+			    	// Combine them and compute invariant mass
+			    	LorentzVector system = neutralkaon + chargedhadron;
+				if( system.M() < 0.6 ) continue;
+    				if( system.M() > 1.3 ) continue;
 				// remove all tracks with possibility to be one of the K0s daughters
 				if( trackPtArray[jtrk] == dau1pt ) continue;
 				if( trackPtArray[jtrk] == dau2pt ) continue;
@@ -862,9 +864,9 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				K0Star_MassVector->push_back(system.M());
 				K0Star_ChargeVector->push_back(trackChargeArray[jtrk]);
 				
-      	}
+      			}
       	
-      	}
+      		}
 		if(K0Star_PtVector->size() > 0){ // only fill tree if event has a K0Star candidate
 			heavyIonTreeOutput->Fill(); // fill event information
 			skimTreeOutput->Fill();		// filter information
@@ -901,8 +903,9 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 
 	} // End loop over events
 
+	cout << "Number of matched events: " << matchedevents << endl;
+
 	// Write the skimmed trees to the output file
-  	TFile *outputFile = new TFile(outputFileName, "RECREATE");
 
 	gDirectory->mkdir("hiEvtAnalyzer");
 	gDirectory->cd("hiEvtAnalyzer");
@@ -919,8 +922,8 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	checkFlatteningTreeOutput->Write();
 
 	gDirectory->cd("../");
-	gDirectory->mkdir("K0StarTree");
-	gDirectory->cd("K0StarTree");
+	gDirectory->mkdir("K0Star");
+	gDirectory->cd("K0Star");
 	K0StarTreeOutput->Write();	
 	gDirectory->cd("../");
   
