@@ -825,8 +825,8 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 
 			    	// Combine them and compute invariant mass
 			    	LorentzVector system = neutralkaon + chargedhadron;
-				if( system.M() < 0.6 ) continue;
-    				if( system.M() > 1.3 ) continue;
+				if( system.M() <= 0.6 ) continue;
+    				if( system.M() >= 1.2 ) continue;
     				if( system.Pt() < 0.5 ) continue;
     				if( fabs(system.Rapidity()) > 2.4 ) continue;
 				// remove all tracks with possibility to be one of the K0s daughters
