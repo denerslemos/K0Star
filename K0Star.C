@@ -827,6 +827,8 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 			    	LorentzVector system = neutralkaon + chargedhadron;
 				if( system.M() < 0.6 ) continue;
     				if( system.M() > 1.3 ) continue;
+    				if( system.Pt() < 0.5 ) continue;
+    				if( fabs(system.Rapidity()) > 2.4 ) continue;
 				// remove all tracks with possibility to be one of the K0s daughters
 				if( trackPtArray[jtrk] == dau1pt ) continue;
 				if( trackPtArray[jtrk] == dau2pt ) continue;
