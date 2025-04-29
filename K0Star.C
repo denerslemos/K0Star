@@ -312,7 +312,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	TBranch *trackVertexDistanceXYBranch;					// Branch for track distance from primary vertex in xy-direction
 	TBranch *trackVertexDistanceXYErrorBranch; 				// Branch for error for track distance from primary vertex in xy-direction
 	TBranch *trackChargeBranch;								// Branch for track charge
-	TBranch *trackChargeBranch;								// Branch for track charge
+	TBranch *trackNHitBranch;								// Branch for track Nhits
 	
 	// Leaves for the track tree
 	const Int_t nMaxTrack = 2000;
