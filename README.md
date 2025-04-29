@@ -17,7 +17,6 @@ git clone git@github.com:denerslemos/K0Star.git
 cd K0Star
 mkdir -p cond
 ```
-Before compile the code you must check the [sub_skim.sh](https://github.com/denerslemos/K0Star/blob/main/sub_skim.sh) lines 4 (CMSSW/src) and 6 (.../K0Star) and replace by your own folders.
 
 Once this steps are done you can compile the code with
 ```
