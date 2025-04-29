@@ -2,12 +2,6 @@
 #include "intro.h"	    // call UIC logo and initialization
 #include "ntrkoff.h"        // get Ntrk offline
 
-//ctes
-#define pimass 0.13957
-#define pro_mass 0.93827
-#define electronMass 0.000511
-
-
 std::map<unsigned long long, int> runLumiEvtToEntryMap;
 unsigned long long keyFromRunLumiEvent(UInt_t run, UInt_t lumi, ULong64_t event);
 
@@ -23,8 +17,11 @@ ouputfile: just a counting number to run on Condor
 */
 void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntrkoff){
 
-    typedef ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>> LorentzVector;
+	typedef PtEtaPhiMVector LorentzVector;
 
+	const double pimass = 0.13957; 
+	const double pro_mass = 0.93827;
+	const double electronMass = 0.000511;
 
 	float ptmin = 0.3;
 	float etamin = 2.4;
@@ -610,7 +607,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	int nEvents = MainV0Tree->GetEntries();
 	cout << "There are " << nEvents << " events" << endl;
  	int matchedevents = 0;	
-	for(int iEvent = 0; iEvent < nEvents; iEvent++) {
+	for(Long64_t iEvent = 0; iEvent < nEvents; iEvent++) {
 		
 		if( iEvent % 100000 == 0 )	std::cout << "iEvent: " << iEvent <<	" of " << nEvents << std::endl;
 
@@ -754,11 +751,9 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				
 				if(K0s_pt->at(ik0s) < ptmin) continue;   //Minimum pT   		
 				if(TMath::Abs(K0s_eta->at(ik0s)) > etamin) continue; //eta acceptance
-
 				if(K0s_d1Nhit->at(ik0s) < 4)continue;
 				if(K0s_d2Nhit->at(ik0s) < 4)continue;			
 				if(K0s_dca->at(ik0s) > 0.5)continue;
-
 				if(fabs(K0s_dxy1->at(ik0s)) < 1.0)continue;
 				if(fabs(K0s_dxy2->at(ik0s)) < 1.0)continue;
 				if(fabs(K0s_dz1->at(ik0s)) < 1.0)continue;
@@ -766,7 +761,6 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				if(K0s_3Dagl->at(ik0s) <= 0.997)continue;
 				if(K0s_3Ddl->at(ik0s) <= 3.5)continue;
 				
-
 				float Pxp = (float) K0s_d1px->at(ik0s);
 				float Pyp = (float) K0s_d1py->at(ik0s);
 				float Pzp = (float) K0s_d1pz->at(ik0s);
@@ -835,7 +829,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 			    	if( system.M() <= 0.6 ) continue;
     			    	if( system.M() >= 1.2 ) continue;
     			    	if( system.Pt() <= 0.5 ) continue;
-    			   	 if( fabs(system.Rapidity()) > 2.4 ) continue;
+    			   	if( fabs(system.Eta()) > 2.4 ) continue;
 				// remove all tracks with possibility to be one of the K0s daughters
 				if( trackPtArray[jtrk] == dau1pt ) continue;
 				if( trackPtArray[jtrk] == dau2pt ) continue;
