@@ -312,6 +312,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	TBranch *trackVertexDistanceXYBranch;					// Branch for track distance from primary vertex in xy-direction
 	TBranch *trackVertexDistanceXYErrorBranch; 				// Branch for error for track distance from primary vertex in xy-direction
 	TBranch *trackChargeBranch;								// Branch for track charge
+	TBranch *trackChargeBranch;								// Branch for track charge
 	
 	// Leaves for the track tree
 	const Int_t nMaxTrack = 2000;
@@ -325,7 +326,8 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	Float_t trackVertexDistanceZErrorArray[nMaxTrack] = {0};			// Array for error for track distance from primary vertex in z-direction
 	Float_t trackVertexDistanceXYArray[nMaxTrack] = {0};				// Array for track distance from primary vertex in xy-direction
 	Float_t trackVertexDistanceXYErrorArray[nMaxTrack] = {0}; 			// Array for error for track distance from primary vertex in xy-direction
-	Int_t trackChargeArray[nMaxTrack] = {0}; 										// Array for track charge
+	Int_t trackChargeArray[nMaxTrack] = {0}; 							// Array for track charge
+	UChar_t trackNHitArray[nMaxTrack] = {0};							// Array for track hits			
 
 
 	// ========================================== //
@@ -407,6 +409,8 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	trackTree->SetBranchAddress("trkDxyError1",&trackVertexDistanceXYErrorArray,&trackVertexDistanceXYErrorBranch);
 	trackTree->SetBranchStatus("trkCharge",1);
 	trackTree->SetBranchAddress("trkCharge",&trackChargeArray,&trackChargeBranch);
+	trackTree->SetBranchStatus("trkNHit",1);
+	trackTree->SetBranchAddress("trkNHit",&trackNHitArray,&trackNHitBranch);
 
 
 	// ========================================== //
@@ -438,6 +442,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	std::vector<int> *Trk_NominalVector = new std::vector<int>(); Trk_NominalVector->clear();
 	std::vector<int> *Trk_TightVector = new std::vector<int>(); Trk_TightVector->clear();
 	std::vector<int> *Trk_LooseVector = new std::vector<int>(); Trk_LooseVector->clear();
+	std::vector<int> *Trk_HitVector = new std::vector<int>(); Trk_HitVector->clear();
 	std::vector<float> *Trk_PtVector = new std::vector<float>(); Trk_PtVector->clear();
 	std::vector<float> *Trk_EtaVector = new std::vector<float>(); Trk_EtaVector->clear();
 	std::vector<float> *Trk_PhiVector = new std::vector<float>(); Trk_PhiVector->clear();
@@ -464,9 +469,11 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	K0StarTreeOutput->Branch("Trk_nominal","vector<int>", &Trk_NominalVector);
 	K0StarTreeOutput->Branch("Trk_tight","vector<int>", &Trk_TightVector);
 	K0StarTreeOutput->Branch("Trk_loose","vector<int>", &Trk_LooseVector);
+	K0StarTreeOutput->Branch("Trk_hits","vector<int>", &Trk_HitVector);	
 	K0StarTreeOutput->Branch("Trk_pt","vector<float>", &Trk_PtVector);
 	K0StarTreeOutput->Branch("Trk_eta","vector<float>", &Trk_EtaVector);
 	K0StarTreeOutput->Branch("Trk_phi","vector<float>", &Trk_PhiVector);
+
 
 	// Event plane
 	TTree *checkFlatteningTreeOutput = new TTree("tree","");
@@ -820,15 +827,15 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				if(fabs(trackVertexDistanceZArray[jtrk]/trackVertexDistanceZErrorArray[jtrk]) >= 5.0) continue;				
 			
 				// Construct Lorentz vectors
-    				LorentzVector neutralkaon(K0s_pt->at(ik0s), K0s_eta->at(ik0s), K0s_phi->at(ik0s), K0s_mass->at(ik0s));
-    				LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
+    			LorentzVector neutralkaon(K0s_pt->at(ik0s), K0s_eta->at(ik0s), K0s_phi->at(ik0s), K0s_mass->at(ik0s));
+    			LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
 
-			    	// Combine them and compute invariant mass
-			    	LorentzVector system = neutralkaon + chargedhadron;
+			    // Combine them and compute invariant mass
+			    LorentzVector system = neutralkaon + chargedhadron;
 				if( system.M() <= 0.6 ) continue;
-    				if( system.M() >= 1.2 ) continue;
-    				if( system.Pt() < 0.5 ) continue;
-    				if( fabs(system.Rapidity()) > 2.4 ) continue;
+    			if( system.M() >= 1.2 ) continue;
+    			if( system.Pt() <= 0.5 ) continue;
+    			if( fabs(system.Rapidity()) > 2.4 ) continue;
 				// remove all tracks with possibility to be one of the K0s daughters
 				if( trackPtArray[jtrk] == dau1pt ) continue;
 				if( trackPtArray[jtrk] == dau2pt ) continue;
@@ -844,6 +851,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				Trk_PtVector->push_back(trackPtArray[jtrk]);
 				Trk_EtaVector->push_back(trackPhiArray[jtrk]);
 				Trk_PhiVector->push_back(trackEtaArray[jtrk]);
+				Trk_HitVector->push_back( (int) trackNHitArray[jtrk] );
 				
 				// K0s part
 				K0s_LooseVector->push_back(1);
@@ -873,13 +881,14 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 			heavyIonTreeOutput->Fill(); // fill event information
 			skimTreeOutput->Fill();		// filter information
 			checkFlatteningTreeOutput->Fill(); // fill EP information	
-     			K0StarTreeOutput->Fill(); // K0Star information
+     		K0StarTreeOutput->Fill(); // K0Star information
 		}
 		
 		// Clear the vectors before the next event! Otherwise all the K0s pile up cumulatively
 		Trk_LooseVector->clear();
 		Trk_NominalVector->clear();
 		Trk_TightVector->clear();
+		Trk_HitVector->clear();
 		Trk_PtVector->clear();
 		Trk_EtaVector->clear();
 		Trk_PhiVector->clear();
