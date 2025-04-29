@@ -15,7 +15,7 @@ Inside of the src folder, download the code using
 ```
 git clone git@github.com:denerslemos/K0Star.git
 cd K0Star
-mkdir cond
+mkdir -p cond
 ```
 Before compile the code you must check the [sub_skim.sh](https://github.com/denerslemos/K0Star/blob/main/sub_skim.sh) lines 4 (CMSSW/src) and 6 (.../K0Star) and replace by your own folders.
 
