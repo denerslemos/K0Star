@@ -26,7 +26,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
     typedef ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double>> LorentzVector;
 
 
-	float ptmin = 0.2;
+	float ptmin = 0.3;
 	float etamin = 2.4;
 
 	TString outputFileName;
@@ -819,7 +819,7 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				// Here I start to play with tracks
 
 				if(trackPtArray[jtrk] < ptmin) continue;   //Minimum pT
-				if(fabs(trackPtArray[jtrk]) > etamin) continue; //eta acceptance
+				if(fabs(trackEtaArray[jtrk]) > etamin) continue; //eta acceptance
 				if(trackChargeArray[jtrk] == 0) continue;
 				if(trackHighPurityArray[jtrk] != 1) continue;
 				if(fabs(trackPtErrorArray[jtrk]/trackPtArray[jtrk]) >= 0.1) continue;
@@ -827,15 +827,15 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				if(fabs(trackVertexDistanceZArray[jtrk]/trackVertexDistanceZErrorArray[jtrk]) >= 5.0) continue;				
 			
 				// Construct Lorentz vectors
-    			LorentzVector neutralkaon(K0s_pt->at(ik0s), K0s_eta->at(ik0s), K0s_phi->at(ik0s), K0s_mass->at(ik0s));
-    			LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
+    				LorentzVector neutralkaon(K0s_pt->at(ik0s), K0s_eta->at(ik0s), K0s_phi->at(ik0s), K0s_mass->at(ik0s));
+    				LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
 
-			    // Combine them and compute invariant mass
-			    LorentzVector system = neutralkaon + chargedhadron;
-				if( system.M() <= 0.6 ) continue;
-    			if( system.M() >= 1.2 ) continue;
-    			if( system.Pt() <= 0.5 ) continue;
-    			if( fabs(system.Rapidity()) > 2.4 ) continue;
+			    	// Combine them and compute invariant mass
+			    	LorentzVector system = neutralkaon + chargedhadron;
+			    	if( system.M() <= 0.6 ) continue;
+    			    	if( system.M() >= 1.2 ) continue;
+    			    	if( system.Pt() <= 0.5 ) continue;
+    			   	 if( fabs(system.Rapidity()) > 2.4 ) continue;
 				// remove all tracks with possibility to be one of the K0s daughters
 				if( trackPtArray[jtrk] == dau1pt ) continue;
 				if( trackPtArray[jtrk] == dau2pt ) continue;
@@ -849,8 +849,8 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				if( fabs(trackVertexDistanceXYArray[jtrk]/trackVertexDistanceXYErrorArray[jtrk]) < 3.0 && fabs(trackVertexDistanceZArray[jtrk]/trackVertexDistanceZErrorArray[jtrk]) < 3.0 ){ Trk_NominalVector->push_back(1); }else{ Trk_NominalVector->push_back(0); }
 				if( fabs(trackVertexDistanceXYArray[jtrk]/trackVertexDistanceXYErrorArray[jtrk]) < 2.0 && fabs(trackVertexDistanceZArray[jtrk]/trackVertexDistanceZErrorArray[jtrk]) < 2.0 &&  fabs(trackPtErrorArray[jtrk]/trackPtArray[jtrk]) < 0.05 ){ Trk_TightVector->push_back(1); }else{ Trk_TightVector->push_back(0); }
 				Trk_PtVector->push_back(trackPtArray[jtrk]);
-				Trk_EtaVector->push_back(trackPhiArray[jtrk]);
-				Trk_PhiVector->push_back(trackEtaArray[jtrk]);
+				Trk_EtaVector->push_back(trackEtaArray[jtrk]);
+				Trk_PhiVector->push_back(trackPhiArray[jtrk]);
 				Trk_HitVector->push_back( (int) trackNHitArray[jtrk] );
 				
 				// K0s part
