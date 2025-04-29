@@ -44,4 +44,5 @@ python3 HTCondor_submit.py -i input_text_file -v v0_input_file -o output_name_fi
  - Q: PWD of the folder you are at (or where you wanna run your code)
 It will automatically include a counter for each input
 
+You can also edit the ```jobsub.py``` to select what you wanna submit. FOr that you must edit the first few lines for your own repositories and uncomment/comment the jobs you wanna submit. Please DO NOT submit all jobs at the same time.
 
