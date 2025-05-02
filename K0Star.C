@@ -435,6 +435,12 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	std::vector<float> *K0s_EtaVector = new std::vector<float>(); K0s_EtaVector->clear();
 	std::vector<float> *K0s_PhiVector = new std::vector<float>(); K0s_PhiVector->clear();
 	std::vector<float> *K0s_MassVector= new std::vector<float>(); K0s_MassVector->clear();
+	std::vector<float> *K0s_D1_PtVector = new std::vector<float>(); K0s_D1_PtVector->clear();
+	std::vector<float> *K0s_D1_EtaVector = new std::vector<float>(); K0s_D1_EtaVector->clear();
+	std::vector<float> *K0s_D1_PhiVector = new std::vector<float>(); K0s_D1_PhiVector->clear();
+	std::vector<float> *K0s_D2_PtVector = new std::vector<float>(); K0s_D2_PtVector->clear();
+	std::vector<float> *K0s_D2_EtaVector = new std::vector<float>(); K0s_D2_EtaVector->clear();
+	std::vector<float> *K0s_D2_PhiVector = new std::vector<float>(); K0s_D2_PhiVector->clear();
 
 	std::vector<int> *Trk_NominalVector = new std::vector<int>(); Trk_NominalVector->clear();
 	std::vector<int> *Trk_TightVector = new std::vector<int>(); Trk_TightVector->clear();
@@ -462,7 +468,13 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	K0StarTreeOutput->Branch("K0s_eta","vector<float>", &K0s_EtaVector);
 	K0StarTreeOutput->Branch("K0s_phi","vector<float>", &K0s_PhiVector);
 	K0StarTreeOutput->Branch("K0s_mass","vector<float>", &K0s_MassVector);
-	
+	F2PrimeTreeOutput->Branch("K0s_d1_pt","vector<float>", &K0s_D1_PtVector);
+	F2PrimeTreeOutput->Branch("K0s_d1_eta","vector<float>", &K0s_D1_EtaVector);
+	F2PrimeTreeOutput->Branch("K0s_d1_phi","vector<float>", &K0s_D1_PhiVector);
+	F2PrimeTreeOutput->Branch("K0s_d2_pt","vector<float>", &K0s_D2_PtVector);
+	F2PrimeTreeOutput->Branch("K0s_d2_eta","vector<float>", &K0s_D2_EtaVector);
+	F2PrimeTreeOutput->Branch("K0s_d2_phi","vector<float>", &K0s_D2_PhiVector);
+		
 	K0StarTreeOutput->Branch("Trk_nominal","vector<int>", &Trk_NominalVector);
 	K0StarTreeOutput->Branch("Trk_tight","vector<int>", &Trk_TightVector);
 	K0StarTreeOutput->Branch("Trk_loose","vector<int>", &Trk_LooseVector);
@@ -744,8 +756,8 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
     		
   	 		for(int idx = 0; idx < totalsize; idx++){ // 2 loops in one
    		
-    				int ik0s = idx / nTracks;
-    				int jtrk = idx % nTracks;   			
+    			int ik0s = idx / nTracks;
+    			int jtrk = idx % nTracks;   			
 
 				// start doing K0s calculations 
 				
@@ -825,18 +837,11 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
     				LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
 
 			    	// Combine them and compute invariant mass
-			    	LorentzVector system = neutralkaon + chargedhadron;
-			    	if( system.M() <= 0.6 ) continue;
-    			    	if( system.M() >= 1.2 ) continue;
-    			    	if( system.Pt() <= 0.5 ) continue;
-    			   	if( fabs(system.Eta()) > 2.4 ) continue;
-				// remove all tracks with possibility to be one of the K0s daughters
-				if( trackPtArray[jtrk] == dau1pt ) continue;
-				if( trackPtArray[jtrk] == dau2pt ) continue;
-				if( trackPhiArray[jtrk] == dauvec1.Phi() ) continue;
-				if( trackPhiArray[jtrk] == dauvec2.Phi() ) continue; 
-				if( trackEtaArray[jtrk] == dauvec1.Eta() ) continue;
-				if( trackEtaArray[jtrk] == dauvec2.Eta() ) continue; 
+			    LorentzVector system = neutralkaon + chargedhadron;
+			    if( system.M() <= 0.6 ) continue;
+    			if( system.M() >= 1.2 ) continue;
+    			if( system.Pt() <= 0.5 ) continue;
+    			if( fabs(system.Eta()) > 2.4 ) continue;
 
 				// Track part
 				Trk_LooseVector->push_back(1);
@@ -860,7 +865,13 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				K0s_EtaVector->push_back(K0s_eta->at(ik0s));
 				K0s_PhiVector->push_back(K0s_phi->at(ik0s));
 				K0s_MassVector->push_back(K0s_mass->at(ik0s));
-
+				K0s_D1_PtVector->push_back(dauvec1.Pt());
+				K0s_D1_EtaVector->push_back(dauvec1.Eta());
+				K0s_D1_PhiVector->push_back(dauvec1.Phi());
+				K0s_D2_PtVector->push_back(dauvec2.Pt());
+				K0s_D2_EtaVector->push_back(dauvec2.Eta());
+				K0s_D2_PhiVector->push_back(dauvec2.Phi());
+				
 				// K0Star part
 				K0Star_PtVector->push_back(system.Pt());
 				K0Star_EtaVector->push_back(system.Eta());
@@ -899,7 +910,13 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 		K0s_EtaVector->clear();
 		K0s_PhiVector->clear();
 		K0s_MassVector->clear();
-		
+		K0s_D1_PtVector->clear();
+		K0s_D1_EtaVector->clear();
+		K0s_D1_PhiVector->clear();
+		K0s_D2_PtVector->clear();
+		K0s_D2_EtaVector->clear();
+		K0s_D2_PhiVector->clear();
+						
 		K0Star_PtVector->clear();
 		K0Star_EtaVector->clear();
 		K0Star_PhiVector->clear();
