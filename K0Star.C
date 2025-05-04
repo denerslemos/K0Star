@@ -468,12 +468,12 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 	K0StarTreeOutput->Branch("K0s_eta","vector<float>", &K0s_EtaVector);
 	K0StarTreeOutput->Branch("K0s_phi","vector<float>", &K0s_PhiVector);
 	K0StarTreeOutput->Branch("K0s_mass","vector<float>", &K0s_MassVector);
-	F2PrimeTreeOutput->Branch("K0s_d1_pt","vector<float>", &K0s_D1_PtVector);
-	F2PrimeTreeOutput->Branch("K0s_d1_eta","vector<float>", &K0s_D1_EtaVector);
-	F2PrimeTreeOutput->Branch("K0s_d1_phi","vector<float>", &K0s_D1_PhiVector);
-	F2PrimeTreeOutput->Branch("K0s_d2_pt","vector<float>", &K0s_D2_PtVector);
-	F2PrimeTreeOutput->Branch("K0s_d2_eta","vector<float>", &K0s_D2_EtaVector);
-	F2PrimeTreeOutput->Branch("K0s_d2_phi","vector<float>", &K0s_D2_PhiVector);
+	K0StarTreeOutput->Branch("K0s_d1_pt","vector<float>", &K0s_D1_PtVector);
+	K0StarTreeOutput->Branch("K0s_d1_eta","vector<float>", &K0s_D1_EtaVector);
+	K0StarTreeOutput->Branch("K0s_d1_phi","vector<float>", &K0s_D1_PhiVector);
+	K0StarTreeOutput->Branch("K0s_d2_pt","vector<float>", &K0s_D2_PtVector);
+	K0StarTreeOutput->Branch("K0s_d2_eta","vector<float>", &K0s_D2_EtaVector);
+	K0StarTreeOutput->Branch("K0s_d2_phi","vector<float>", &K0s_D2_PhiVector);
 		
 	K0StarTreeOutput->Branch("Trk_nominal","vector<int>", &Trk_NominalVector);
 	K0StarTreeOutput->Branch("Trk_tight","vector<int>", &Trk_TightVector);
