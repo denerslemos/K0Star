@@ -749,10 +749,10 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 		mult_trackm4 = (float) eventPlaneMultiplicity[105];
 		mult_trackp4 = (float) eventPlaneMultiplicity[106];
 
-	    	// --> Loop over K0s+charged hadrons
-    		if( K0s_pt->size() > 0 && nTracks > 0 ){
+	    // --> Loop over K0s+charged hadrons
+    	if( K0s_pt->size() > 0 && nTracks > 0 ){
     	
-    			int totalsize = K0s_pt->size() * nTracks;
+    		int totalsize = K0s_pt->size() * nTracks;
     		
   	 		for(int idx = 0; idx < totalsize; idx++){ // 2 loops in one
    		
@@ -818,9 +818,6 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				energyd1 = sqrt(massd1*massd1+pvector1.P()*pvector1.P());
 				energyd2 = sqrt(massd2*massd2+pvector2.P()*pvector2.P());
 				invmassprotonpi = sqrt((energyd1+energyd2)*(energyd1+energyd2)-dauvecsum.Mag2());
-						
-				float dau1pt = sqrt(Pxp*Pxp+Pyp*Pyp);
-				float dau2pt = sqrt(Pxn*Pxn+Pyn*Pyn);
 				
 				// Here I start to play with tracks
 
@@ -833,10 +830,10 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				if(fabs(trackVertexDistanceZArray[jtrk]/trackVertexDistanceZErrorArray[jtrk]) >= 5.0) continue;				
 			
 				// Construct Lorentz vectors
-    				LorentzVector neutralkaon(K0s_pt->at(ik0s), K0s_eta->at(ik0s), K0s_phi->at(ik0s), K0s_mass->at(ik0s));
-    				LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
+    			LorentzVector neutralkaon(K0s_pt->at(ik0s), K0s_eta->at(ik0s), K0s_phi->at(ik0s), K0s_mass->at(ik0s));
+    			LorentzVector chargedhadron(trackPtArray[jtrk], trackEtaArray[jtrk], trackPhiArray[jtrk], pimass); // pion assumption
 
-			    	// Combine them and compute invariant mass
+			    // Combine them and compute invariant mass
 			    LorentzVector system = neutralkaon + chargedhadron;
 			    if( system.M() <= 0.6 ) continue;
     			if( system.M() >= 1.2 ) continue;
@@ -879,9 +876,9 @@ void K0Star(TString input_file, TString input_V0file, TString ouputfile, int ntr
 				K0Star_MassVector->push_back(system.M());
 				K0Star_ChargeVector->push_back(trackChargeArray[jtrk]);
 				
-      			}
-      	
       		}
+      	
+      	}
 		if(K0Star_PtVector->size() > 0){ // only fill tree if event has a K0Star candidate
 			heavyIonTreeOutput->Fill(); // fill event information
 			skimTreeOutput->Fill();		// filter information
